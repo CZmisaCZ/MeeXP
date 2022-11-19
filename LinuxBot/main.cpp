@@ -137,6 +137,91 @@ void fridayFunc(dpp::slashcommand_t event)
     }
 }
 
+void fridayFunc(dpp::message_create_t event,dpp::cluster& bot)
+{
+    time_t now = time(NULL);
+    if (dayofweek(now, +2) == 5)
+    {
+        if (friday == false)
+        {
+            /* create the embed */
+            dpp::embed embed = dpp::embed().
+                set_color(dpp::colors::sti_blue).
+                set_title("***WHEN IT FRIDAY***").
+                set_url("https://youtu.be/_2U-0fAe-QQ").
+                //set_author("Some name", "https://dpp.dev/", "https://dpp.dev/DPP-Logo.png").
+                //set_description("Some description here").
+               //set_thumbnail("https://dpp.dev/DPP-Logo.png").
+
+                set_image("https://cdn.discordapp.com/attachments/656751148379668500/1013462947906994229/today-is.gif").
+                set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+                set_timestamp(time(0));
+
+            /* reply with the created embed */
+            bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
+            friday = true;
+        }
+        else
+        {
+            /* create the embed */
+            dpp::embed embed = dpp::embed().
+                set_color(dpp::colors::rust).
+                set_title(":skull:").
+                set_description("someone already used !friday").
+                set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+                set_timestamp(time(0));
+
+            /* reply with the created embed */
+            bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
+        }
+
+    }
+    else
+    {
+        time_t now = time(NULL);
+        int localtim = dayofweek(now, +2);
+        std::string desc;
+        switch (localtim)
+        {
+        case 0:
+            desc = "5 days remain to friday";
+            break;
+        case 1:
+            desc = "4 days remain to friday";
+            break;
+        case 2:
+            desc = "3 days remain to friday";
+            break;
+        case 3:
+            desc = "2 days remain to friday";
+            break;
+        case 4:
+            desc = "1 days remain to friday";
+            break;
+        case 6:
+            desc = "6 days remain to friday";
+            break;
+        default:
+            break;
+        }
+
+        /* create the embed */
+        dpp::embed embed = dpp::embed().
+            set_color(dpp::colors::rust).
+            set_title("there is no friday").
+
+
+            set_description(desc).
+
+            set_footer(dpp::embed_footer().set_text("*also try /friday*").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+            set_timestamp(time(0));
+
+        /* reply with the created embed */
+        bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
+    }
+}
+
+bool funni = false;
 
 int main()
 {
@@ -149,90 +234,16 @@ int main()
     /* Message handler to look for a command called !embed */
     bot.on_message_create([&bot](const dpp::message_create_t& event) {
         if (event.msg.content == "!friday") {
-
-            time_t now = time(NULL);
-            if (dayofweek(now, +2) == 5)
-            {
-                if (friday == false)
-                {
-                    /* create the embed */
-                    dpp::embed embed = dpp::embed().
-                        set_color(dpp::colors::sti_blue).
-                        set_title("***WHEN IT FRIDAY***").
-                        set_url("https://youtu.be/_2U-0fAe-QQ").
-                        //set_author("Some name", "https://dpp.dev/", "https://dpp.dev/DPP-Logo.png").
-                        //set_description("Some description here").
-                       //set_thumbnail("https://dpp.dev/DPP-Logo.png").
-
-                        set_image("https://cdn.discordapp.com/attachments/656751148379668500/1013462947906994229/today-is.gif").
-                        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
-                        set_timestamp(time(0));
-
-                    /* reply with the created embed */
-                    bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
-                    friday = true;
-                }
-                else
-                {
-                    /* create the embed */
-                    dpp::embed embed = dpp::embed().
-                        set_color(dpp::colors::rust).
-                        set_title(":skull:").
-                        set_description("someone already used !friday").
-                        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
-                        set_timestamp(time(0));
-
-                    /* reply with the created embed */
-                    bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
-                }
-
-            }
-            else
-            {
-                time_t now = time(NULL);
-                int localtim = dayofweek(now, +2);
-                std::string desc;
-                switch (localtim)
-                {
-                case 0:
-                    desc = "5 days remain to friday";
-                    break;
-                case 1:
-                    desc = "4 days remain to friday";
-                    break;
-                case 2:
-                    desc = "3 days remain to friday";
-                    break;
-                case 3:
-                    desc = "2 days remain to friday";
-                    break;
-                case 4:
-                    desc = "1 days remain to friday";
-                    break;
-                case 6:
-                    desc = "6 days remain to friday";
-                    break;
-                default:
-                    break;
-                }
-
-                /* create the embed */
-                dpp::embed embed = dpp::embed().
-                    set_color(dpp::colors::rust).
-                    set_title("there is no friday").
-
-
-                    set_description(desc).
-
-                    set_footer(dpp::embed_footer().set_text("*also try /friday*").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
-                    set_timestamp(time(0));
-
-                /* reply with the created embed */
-                bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
-            }
+            fridayFunc(event, bot);
         }
     if (event.msg.content == "!ping") {
         event.reply("Pong!");
+    }
+    if (event.msg.content == "ananas")
+    {
+        if (funni==false)
+        event.reply("https://tenor.com/view/haram-heisenberg-gif-20680378");
+        funni = true;
     }
     //if (event.msg.content == "!day") {
     //    time_t now = time(NULL);
@@ -298,6 +309,7 @@ int main()
             if (dayofweek(now, +2) != 5)
             {
                 friday = false;
+                funni = true;
             }
         }
     };
