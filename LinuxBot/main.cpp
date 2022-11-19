@@ -222,6 +222,29 @@ void fridayFunc(dpp::message_create_t event,dpp::cluster& bot)
 }
 
 bool funni = false;
+void doAfunni(const dpp::message_create_t& event)
+{
+    if (funni == false)
+    {
+        if (event.msg.content == "ananas" || event.msg.content == "Ananas")
+        {
+            event.reply("https://tenor.com/view/haram-heisenberg-gif-20680378");
+        }
+        if (event.msg.content == "nesnáším kofolu")
+        {
+            event.reply("https://tenor.com/view/can-we-ban-this-guy-gif-21304842");
+        }
+        if (event.msg.content == "<@1013729968267735080>")
+        {
+            event.reply("https://cdn.discordapp.com/attachments/656751148379668500/1043667664217841664/unknown.png");
+        }
+        if (event.msg.is_dm())
+        {
+            event.reply("https://media.discordapp.net/attachments/823542298365001788/1017465348720689252/image0-7.gif");
+        }
+        funni = true;
+    }
+}
 
 int main()
 {
@@ -233,18 +256,15 @@ int main()
 
     /* Message handler to look for a command called !embed */
     bot.on_message_create([&bot](const dpp::message_create_t& event) {
-        if (event.msg.content == "!friday") {
+        if (event.msg.content == "!friday" && event.msg.is_dm() == false) {
             fridayFunc(event, bot);
         }
     if (event.msg.content == "!ping") {
         event.reply("Pong!");
     }
-    if (event.msg.content == "ananas")
-    {
-        if (funni==false)
-        event.reply("https://tenor.com/view/haram-heisenberg-gif-20680378");
-        funni = true;
-    }
+
+    doAfunni(event);
+
     //if (event.msg.content == "!day") {
     //    time_t now = time(NULL);
     //    const std::string s = "Current day of week: " + std::to_string(dayofweek(now, +2));
