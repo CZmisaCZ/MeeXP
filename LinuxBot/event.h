@@ -7,5 +7,5 @@
 struct UserXP
 {
 	dpp::user user;
-	int64_t xp=0;
+	unsigned long long xp = 0;
 };

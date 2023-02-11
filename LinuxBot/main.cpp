@@ -5,7 +5,6 @@ const std::string    BOT_TOKEN = "INSET TOKEN";
 #include <string>
 #include <stdio.h>
 #include <time.h>
-#include "event.h"
 
 #ifdef linux
 

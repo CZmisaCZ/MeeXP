@@ -1,7 +1,8 @@
 #include "event.h"
+#include "fileIO.h"
 
-std::vector<UserXP*> UserXPs;
 std::vector<dpp::user> toUpdate;
+std::vector<UserXP*> UserXPs;
 
 // add user to list that is waiting for adding XP
 bool addXP(dpp::user user)
@@ -22,13 +23,9 @@ void addRandomXP(int at)
 void applyXP()
 {
 	for (auto i = 0; i < UserXPs.size(); i++)
-	{
 		for (auto ii = 0; ii < toUpdate.size(); ii++)
-		{
 			if (UserXPs.at(i)->user == toUpdate.at(ii))
 				addRandomXP(i);
-		}
-	}
 
 	toUpdate.clear();
 }
