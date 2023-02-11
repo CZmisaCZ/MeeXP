@@ -141,6 +141,9 @@
     <ClInclude Include="event.h" />
     <ClInclude Include="fileIO.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="XPdata.cfg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

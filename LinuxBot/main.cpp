@@ -1,15 +1,17 @@
 #include <dpp/dpp.h>
 
-const std::string    BOT_TOKEN = "INSET TOKEN";
+const std::string BOT_TOKEN = "";
 
 #include <string>
 #include <stdio.h>
 #include <time.h>
+#include "fileIO.h"
+#include "event.h"
 
 #ifdef linux
 
 #include <unistd.h>
-unsigned int microsecond = 200000;//200ms
+unsigned int microsecond = 250000;//250ms
 
 #endif
 
@@ -68,6 +70,10 @@ void fridayFunc(dpp::message_create_t event, dpp::cluster& bot)
 
 int main()
 {
+    // time as seed for random generator used in addRandomXP();
+    srand(time(NULL));
+
+    // create bot cluster
     dpp::cluster bot(BOT_TOKEN, dpp::i_default_intents | dpp::i_message_content);
 
     // output simple log messages to stdout
@@ -78,9 +84,11 @@ int main()
         if (event.msg.content == "!rank" && event.msg.is_dm() == false) {
             fridayFunc(event, bot);
         }
-    if (event.msg.content == "!ping") {
-        event.reply("Pong!");
-    }
+        if (event.msg.content == "!ping") {
+            event.reply("Pong!");
+        }
+
+        addXP(event.msg.author);
 
         });
 
@@ -109,18 +117,19 @@ int main()
         }
         if (event.command.get_command_name() == "rank")
         {
-            event.reply("Pong!");
             dpp::interaction interaction = event.command;
             dpp::command_interaction cmd_data = interaction.get_command_interaction();
-            auto subcommand = cmd_data.options[0];
-            if (subcommand.name == "Name") {
+            auto subcommand = cmd_data.options.at(0);
+            if (subcommand.name == "Member") {
                 if (!subcommand.options.empty()) {
-
+                    event.reply("> XP: " + std::to_string(getXP(event.command.get_issuing_user())));
                 }
                 else {
-                    event.reply("No user specified");
+                    event.reply("XP: "+std::to_string(getXP(event.command.get_issuing_user())));
                 }
             }
+            else
+                event.reply("XP: " + std::to_string(getXP(event.command.get_issuing_user())));
         }
         if (event.command.get_command_name() == "topranks")
         {
@@ -136,7 +145,11 @@ int main()
     using namespace std::this_thread;     // sleep_for, sleep_until
     using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
     using std::chrono::system_clock;
+    using namespace std::chrono;
+    auto start = high_resolution_clock::now();
     #endif
+
+    int sec=0;
 
     while (true)
     {
@@ -152,6 +165,14 @@ int main()
         }
         #endif
 
+        sec++;
+        if (sec == 2)
+        {
+            sec = 0;
+
+            applyXP();
+            saveData(getDatabase());
+        }
     };
 
     return 0;

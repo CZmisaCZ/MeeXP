@@ -2,7 +2,12 @@
 #include "event.h"
 #include <iostream>
 
-void loadData(std::vector<UserXP*> UserXPs)
+void merge(std::vector<UserXP*> a, std::vector<UserXP*> b)
+{
+
+};
+
+std::vector<UserXP*> loadData(std::vector<UserXP*> UserXPs)
 {
 	UserXPs.clear();
 
@@ -27,6 +32,8 @@ void loadData(std::vector<UserXP*> UserXPs)
 	{
 		printf("Could not load database");
 	}
+
+	return UserXPs;
 }
 
 void saveData(std::vector<UserXP*> UserXPs)
