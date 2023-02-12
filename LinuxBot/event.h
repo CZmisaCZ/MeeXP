@@ -10,6 +10,7 @@ struct UserXP
 	unsigned long long xp = 0;
 	short lvl = 1;
 	bool sielent = 0;
+	bool updated = 0;
 };
 
 struct RankData

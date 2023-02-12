@@ -24,48 +24,19 @@ unsigned int microsecond = 250000;//250ms
 
 #endif
 
- // embed build example, as a reply
-void fridayFunc(dpp::slashcommand_t event)
+void levelupEmbed(dpp::message_create_t event, dpp::cluster& bot)
 {
+    //create embed
+    dpp::embed embed = dpp::embed().
+        set_color(dpp::colors::sti_blue).
+        set_title("***LEVEL UP***").
 
-	/* create the embed */
-	dpp::embed embed = dpp::embed().
-		set_color(dpp::colors::sti_blue).
-		set_title("***WHEN IT FRIDAY***").
-		set_url("https://youtu.be/_2U-0fAe-QQ").
-		//set_author("Some name", "https://dpp.dev/", "https://dpp.dev/DPP-Logo.png").
-		//set_description("Some description here").
-	   //set_thumbnail("https://dpp.dev/DPP-Logo.png").
+        set_image("https://cdn.discordapp.com/attachments/656751148379668500/1013462947906994229/today-is.gif").
+        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+        set_timestamp(time(0));
 
-		set_image("https://cdn.discordapp.com/attachments/656751148379668500/1013462947906994229/today-is.gif").
-		set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
-		set_timestamp(time(0));
-
-	/* reply with the created embed */
-	event.reply(dpp::message(event.command.channel_id, embed).set_reference(event.command.message_id));
-
-}
-
-// embed build example
-void fridayFunc(dpp::message_create_t event, dpp::cluster& bot)
-{
-
-	/* create the embed */
-	dpp::embed embed = dpp::embed().
-		set_color(dpp::colors::sti_blue).
-		set_title("***WHEN IT FRIDAY***").
-		set_url("https://youtu.be/_2U-0fAe-QQ").
-		//set_author("Some name", "https://dpp.dev/", "https://dpp.dev/DPP-Logo.png").
-		//set_description("Some description here").
-	   //set_thumbnail("https://dpp.dev/DPP-Logo.png").
-
-		set_image("https://cdn.discordapp.com/attachments/656751148379668500/1013462947906994229/today-is.gif").
-		set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
-		set_timestamp(time(0));
-
-	/* reply with the created embed */
-	bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
-
+    // send embed as reply
+    bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
 }
 
 void rankEmbed(dpp::slashcommand_t event)
@@ -86,12 +57,10 @@ void rankEmbed(dpp::slashcommand_t event)
 
     // send embed as reply
     event.reply(dpp::message(event.command.channel_id, embed).set_reference(event.command.message_id));
-
 }
 
 void xpNeededEmbed(dpp::slashcommand_t event)
 {
-    //getDatabase();
     std::string table;
 
     unsigned long long xp=0;
@@ -163,9 +132,12 @@ int main()
             event.reply("Pong!");
         }
 
-        addXP(event.msg.author);
+        if (addXP(event.msg.author))
+        {
+            levelupEmbed(event, bot);
+        }
 
-        });
+    });
 
     // adding a slash commands
     bot.on_ready([&bot](const dpp::ready_t& event) {
@@ -181,7 +153,7 @@ int main()
 
             bot.global_command_create(dpp::slashcommand("topranks", "Show a list of members with highest ranks.", bot.me.id));
         }
-        });
+    });
 
 
     // slash command handler
@@ -242,7 +214,7 @@ int main()
         #endif
 
         sec++;
-        if (sec == 24)
+        if (sec == 4)
         {
             sec = 0;
 
