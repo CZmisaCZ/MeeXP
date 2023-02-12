@@ -1,5 +1,6 @@
 #include "event.h"
 #include "fileIO.h"
+#include <iostream>
 
 std::vector<UserXP*> UserXPs;
 
@@ -8,7 +9,7 @@ unsigned long long getXPforLvl(short lvl)
 {
 	unsigned long long xp = 0;
 
-	for (auto i = 0; i <= lvl; i++)
+	for (auto i = 0; i < lvl; i++)
 	{
 		xp += ((5 * pow(i, 2) + 50 * i + 100));
 	}
@@ -18,10 +19,16 @@ unsigned long long getXPforLvl(short lvl)
 
 bool checkLvlUp(int at)
 {
-	if (UserXPs.at(at)->xp >= getXPforLvl(UserXPs.at(at)->lvl))
+	if (UserXPs.at(at)->xp >= getXPforLvl(UserXPs.at(at)->lvl+1))
 	{
+		printf(("cur xp:" + std::to_string(UserXPs.at(at)->xp) + "\n").c_str());
 		UserXPs.at(at)->xp = UserXPs.at(at)->xp - getXPforLvl(UserXPs.at(at)->lvl);
+
+		printf(("- xp:" + std::to_string(getXPforLvl(UserXPs.at(at)->lvl)) + "\n").c_str());
+		printf(("after xp:" + std::to_string(UserXPs.at(at)->xp) + "\n").c_str());
+
 		UserXPs.at(at)->lvl++;
+
 		return 1;
 	}
 	else

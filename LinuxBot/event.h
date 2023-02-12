@@ -8,7 +8,7 @@ struct UserXP
 {
 	unsigned long long userID;
 	unsigned long long xp = 0;
-	short lvl = 1;
+	short lvl = 0;
 	bool sielent = 0;
 	bool updated = 0;
 };
