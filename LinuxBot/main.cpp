@@ -41,16 +41,18 @@ void levelupEmbed(dpp::message_create_t event, dpp::cluster& bot)
 
 void rankEmbed(dpp::slashcommand_t event)
 {
+    RankData data = getRank(event.command.get_issuing_user().id);
+
     //create embed
     dpp::embed embed = dpp::embed().
         set_color(dpp::colors::moon_yellow).
         //set_title(event.command.get_issuing_user().get_mention()).
         set_description(
             "__"+event.command.get_issuing_user().get_mention() + "__\n" +
-            "rank: "+std::to_string(getRank(event.command.get_issuing_user().id).rank)+ "# *out of " + std::to_string(getRank(event.command.get_issuing_user().id).maxrank) + " total users*\n"+
-            "level: " + std::to_string(getRank(event.command.get_issuing_user().id).lvl) + "\n"+
-            "total xp: " + std::to_string(getRank(event.command.get_issuing_user().id).xp) + "\n"
-            "xp needed for level up: " + std::to_string(getRank(event.command.get_issuing_user().id).xptonextlvl) + "\n"
+            "rank: "+std::to_string(data.rank)+ "# *out of " + std::to_string(data.maxrank) + " total users*\n"+
+            "level: " + std::to_string(data.lvl) + "\n"+
+            "total xp: " + std::to_string(data.xp) + "\n"
+            "xp needed for level up: " + std::to_string(data.xptonextlvl) + "\n"
         ).
         set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
         set_timestamp(time(0));
@@ -66,7 +68,7 @@ void xpNeededEmbed(dpp::slashcommand_t event)
     unsigned long long xp=0;
     for (auto lvl =0; lvl <= 100; lvl++)
     {
-        xp = (5 * pow(lvl, 2) + 50 * lvl + 100);
+        xp += (5 * pow(lvl, 2) + 50 * lvl + 100);
         table = table + "**rank: " + std::to_string(lvl) + "**\nxp: " + std::to_string(xp)+"\n";
     }
 
@@ -152,6 +154,8 @@ int main()
             bot.global_command_create(rankcommand);
 
             bot.global_command_create(dpp::slashcommand("topranks", "Show a list of members with highest ranks.", bot.me.id));
+
+            bot.global_command_create(dpp::slashcommand("xpneed", "Show how many xp do you need for ranks form 0 to 100.", bot.me.id));
         }
     });
 
@@ -167,7 +171,7 @@ int main()
             dpp::interaction interaction = event.command;
             dpp::command_interaction cmd_data = interaction.get_command_interaction();
             auto subcommand = cmd_data.options.at(0);
-            if (subcommand.name == "animal") {
+            if (subcommand.name == "Member") {
                 if (!subcommand.options.empty()) {
                     rankEmbed(event);
                 }
@@ -181,6 +185,10 @@ int main()
         if (event.command.get_command_name() == "topranks")
         {
             topRanksEmbed(event);
+        }
+        if (event.command.get_command_name() == "xpneed")
+        {
+            xpNeededEmbed(event);
         }
 
     });

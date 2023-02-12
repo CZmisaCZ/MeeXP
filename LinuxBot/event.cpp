@@ -3,15 +3,24 @@
 
 std::vector<UserXP*> UserXPs;
 
-auto needXPforLvl(auto arrayPos)
+// check how many xp in total is needed for next lvl (including lvls before)
+unsigned long long getXPforLvl(short lvl)
 {
-	return ((5 * pow(UserXPs.at(arrayPos)->lvl, 2) + 50 * UserXPs.at(arrayPos)->lvl + 100));
+	unsigned long long xp = 0;
+
+	for (auto i = 0; i <= lvl; i++)
+	{
+		xp += ((5 * pow(i, 2) + 50 * i + 100));
+	}
+
+	return xp;
 }
 
 bool checkLvlUp(int at)
 {
-	if (UserXPs.at(at)->xp >= needXPforLvl(at))
+	if (UserXPs.at(at)->xp >= getXPforLvl(UserXPs.at(at)->lvl))
 	{
+		UserXPs.at(at)->xp = UserXPs.at(at)->xp - getXPforLvl(UserXPs.at(at)->lvl);
 		UserXPs.at(at)->lvl++;
 		return 1;
 	}
@@ -53,7 +62,7 @@ bool addXP(dpp::user user)
 	for (auto i = 0; i < UserXPs.size(); i++)
 		if (UserXPs.at(i)->userID==user.id)return 0;
 
-	addUser(user.id);
+	if(user.is_bot() == false)addUser(user.id);
 	return 0;
 }
 
@@ -106,7 +115,7 @@ RankData getRank(unsigned long long ID)
 		if (UserXPs.at(i)->userID == ID) { num = i; loop = false; }
 
 	//if user not found then add new
-	if (loop == false)
+	if (loop == true)
 	{
 		num = UserXPs.size();
 		addUser(ID);
@@ -118,7 +127,7 @@ RankData getRank(unsigned long long ID)
 		if (UserXPs.at(i)->xp < UserXPs.at(num)->xp)rank++;
 	}
 
-	return RankData(ID, UserXPs.at(num)->xp, needXPforLvl(num), rank, UserXPs.size(), UserXPs.at(num)->lvl);
+	return RankData(ID, UserXPs.at(num)->xp + getXPforLvl(UserXPs.at(num)->lvl), getXPforLvl(UserXPs.at(num)->lvl+1), rank, UserXPs.size(), UserXPs.at(num)->lvl);
 }
 
 std::vector<UserXP*> getDatabase()
