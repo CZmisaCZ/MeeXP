@@ -17,16 +17,11 @@ unsigned long long getXPforLvl(short lvl)
 	return xp;
 }
 
+// checks if user has enough xp for lvl up, if yes then increases level and returns 1 else retrun 0
 bool checkLvlUp(int at)
 {
 	if (UserXPs.at(at)->xp >= getXPforLvl(UserXPs.at(at)->lvl+1))
 	{
-		printf(("cur xp:" + std::to_string(UserXPs.at(at)->xp) + "\n").c_str());
-		UserXPs.at(at)->xp = UserXPs.at(at)->xp - getXPforLvl(UserXPs.at(at)->lvl);
-
-		printf(("- xp:" + std::to_string(getXPforLvl(UserXPs.at(at)->lvl)) + "\n").c_str());
-		printf(("after xp:" + std::to_string(UserXPs.at(at)->xp) + "\n").c_str());
-
 		UserXPs.at(at)->lvl++;
 
 		return 1;
@@ -65,11 +60,17 @@ bool addXP(dpp::user user)
 			}
 		}
 
-	// if user not found add him
+	// find it user exists in a database
 	for (auto i = 0; i < UserXPs.size(); i++)
 		if (UserXPs.at(i)->userID==user.id)return 0;
 
-	if(user.is_bot() == false)addUser(user.id);
+	// if not add him and apply xp
+	if (user.is_bot() == false)
+	{
+		addUser(user.id);
+		addRandomXP(UserXPs.size()-1);
+		return checkLvlUp(UserXPs.size()-1);
+	}
 	return 0;
 }
 
@@ -113,9 +114,10 @@ std::vector<UserXP*> getTopDatabase(short howmany)
 	return top;
 }
 
-//returns users position in leaderboard
+//use user ID to find him in database and funcion returns "RankData" that are all nescessary data for building embeds or messages
 RankData getRank(unsigned long long ID)
 {
+	//get user pos in database using ID
 	bool loop = true;
 	auto num = 0;
 	for (auto i = 0; i < UserXPs.size() && loop == true; i++)
@@ -128,13 +130,20 @@ RankData getRank(unsigned long long ID)
 		addUser(ID);
 	}
 
+	//calc user rank
 	auto rank = 1;
 	for (auto i = 0; i < UserXPs.size(); i++)
 	{
 		if (UserXPs.at(i)->xp < UserXPs.at(num)->xp)rank++;
 	}
 
-	return RankData(ID, UserXPs.at(num)->xp + getXPforLvl(UserXPs.at(num)->lvl), getXPforLvl(UserXPs.at(num)->lvl+1), rank, UserXPs.size(), UserXPs.at(num)->lvl);
+	unsigned long long nextLVL = getXPforLvl(UserXPs.at(num)->lvl + 1);
+	unsigned long long currLVL = getXPforLvl(UserXPs.at(num)->lvl);
+
+	float procet = (currLVL - nextLVL) / (UserXPs.at(num)->xp - currLVL);
+	
+
+	return RankData(ID, UserXPs.at(num)->xp, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
 }
 
 std::vector<UserXP*> getDatabase()

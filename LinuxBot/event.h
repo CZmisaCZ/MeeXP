@@ -15,10 +15,11 @@ struct UserXP
 
 struct RankData
 {
-	RankData(unsigned long long userID, unsigned long long xp, unsigned long long xptonextlvl, unsigned long long rank, unsigned long long maxrank, short lvl)
+	RankData(unsigned long long userID, unsigned long long xp, unsigned long long xptothislvl, unsigned long long xptonextlvl, unsigned long long rank, unsigned long long maxrank, short lvl)
 	{
 		this->userID = userID;
 		this->xp = xp;
+		this->xptothislvl = xptothislvl;
 		this->xptonextlvl = xptonextlvl;
 		this->rank = rank;
 		this->maxrank = maxrank;
@@ -27,6 +28,7 @@ struct RankData
 
 	unsigned long long userID;
 	unsigned long long xp;
+	unsigned long long xptothislvl;
 	unsigned long long xptonextlvl;
 	unsigned long long rank;
 	unsigned long long maxrank;

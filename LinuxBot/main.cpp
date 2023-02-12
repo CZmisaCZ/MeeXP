@@ -1,4 +1,4 @@
-#include <dpp/dpp.h>
+﻿#include <dpp/dpp.h>
 
 const std::string BOT_TOKEN = "MTAxMzcyOTk2ODI2NzczNTA4MA.GSCbqc.QvfAw-mae5Tl3ZXEXNNHvNgtLtwYNZ6kRozREA";
 
@@ -43,17 +43,23 @@ void rankEmbed(dpp::slashcommand_t event)
 {
     RankData data = getRank(event.command.get_issuing_user().id);
 
+    std::string desc;
+
+    desc = "__" + event.command.get_issuing_user().get_mention() + "__\n" +
+        "rank: " + std::to_string(data.rank) + "# *out of " + std::to_string(data.maxrank) + " total users*\n\n";
+
+    //█▉▊▋▌▍▎▏░▒▓
+
+    desc += "level: " + std::to_string(data.lvl) + "\n" +
+        "total xp: " + std::to_string(data.xp) + "\n"
+        "xp needed for level up: " + std::to_string(data.xptonextlvl) + "\n";
+
+
     //create embed
     dpp::embed embed = dpp::embed().
         set_color(dpp::colors::moon_yellow).
         //set_title(event.command.get_issuing_user().get_mention()).
-        set_description(
-            "__"+event.command.get_issuing_user().get_mention() + "__\n" +
-            "rank: "+std::to_string(data.rank)+ "# *out of " + std::to_string(data.maxrank) + " total users*\n"+
-            "level: " + std::to_string(data.lvl) + "\n"+
-            "total xp: " + std::to_string(data.xp) + "\n"
-            "xp needed for level up: " + std::to_string(data.xptonextlvl) + "\n"
-        ).
+        set_description(desc).
         set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
         set_timestamp(time(0));
 
@@ -156,6 +162,8 @@ int main()
             bot.global_command_create(dpp::slashcommand("topranks", "Show a list of members with highest ranks.", bot.me.id));
 
             bot.global_command_create(dpp::slashcommand("xpneed", "Show how many xp do you need for ranks form 0 to 100.", bot.me.id));
+
+            bot.global_command_create(dpp::slashcommand("silence", "Turn off level up messages for yourself.", bot.me.id));
         }
     });
 
