@@ -1,6 +1,6 @@
 #include <dpp/dpp.h>
 
-const std::string BOT_TOKEN = "";
+const std::string BOT_TOKEN = "MTAxMzcyOTk2ODI2NzczNTA4MA.GSCbqc.QvfAw-mae5Tl3ZXEXNNHvNgtLtwYNZ6kRozREA";
 
 #include <string>
 #include <stdio.h>
@@ -68,6 +68,81 @@ void fridayFunc(dpp::message_create_t event, dpp::cluster& bot)
 
 }
 
+void rankEmbed(dpp::slashcommand_t event)
+{
+    //create embed
+    dpp::embed embed = dpp::embed().
+        set_color(dpp::colors::moon_yellow).
+        //set_title(event.command.get_issuing_user().get_mention()).
+        set_description(
+            "__"+event.command.get_issuing_user().get_mention() + "__\n" +
+            "rank: "+std::to_string(getRank(event.command.get_issuing_user().id).rank)+ "# *out of " + std::to_string(getRank(event.command.get_issuing_user().id).maxrank) + " total users*\n"+
+            "level: " + std::to_string(getRank(event.command.get_issuing_user().id).lvl) + "\n"+
+            "total xp: " + std::to_string(getRank(event.command.get_issuing_user().id).xp) + "\n"
+            "xp needed for level up: " + std::to_string(getRank(event.command.get_issuing_user().id).xptonextlvl) + "\n"
+        ).
+        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+        set_timestamp(time(0));
+
+    // send embed as reply
+    event.reply(dpp::message(event.command.channel_id, embed).set_reference(event.command.message_id));
+
+}
+
+void xpNeededEmbed(dpp::slashcommand_t event)
+{
+    //getDatabase();
+    std::string table;
+
+    unsigned long long xp=0;
+    for (auto lvl =0; lvl <= 100; lvl++)
+    {
+        xp = (5 * pow(lvl, 2) + 50 * lvl + 100);
+        table = table + "**rank: " + std::to_string(lvl) + "**\nxp: " + std::to_string(xp)+"\n";
+    }
+
+    //create embed
+    dpp::embed embed = dpp::embed().
+        set_color(dpp::colors::moon_yellow).
+        set_title("__0 to 100 ranks and xp needed to rank up__").
+        set_url("https://docs.google.com/spreadsheets/d/10s70KvJEFxrwb-bulRzP-r17Z6ZdSnH7lH5AV_DC0bM/edit#gid=0").
+        set_description(table).
+        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+        set_timestamp(time(0));
+
+    // send embed as reply
+    event.reply(dpp::message(event.command.channel_id, embed).set_reference(event.command.message_id));
+
+}
+
+void topRanksEmbed(dpp::slashcommand_t event)
+{
+    //getDatabase();
+    std::vector<UserXP*> top = getTopDatabase(10);
+    std::string table;
+
+    for (auto i = 0; i < top.size(); i++)
+    {
+        dpp::user a;
+        a.id = top.at(i)->userID;
+        
+        table = table + std::to_string(top.at(i)->xp) + "xp " + a.get_mention() + "\n";
+    }
+
+    //create embed
+    dpp::embed embed = dpp::embed().
+        set_color(dpp::colors::moon_yellow).
+        set_title("__top users__").
+        set_url("https://docs.google.com/spreadsheets/d/10s70KvJEFxrwb-bulRzP-r17Z6ZdSnH7lH5AV_DC0bM/edit#gid=0").
+        set_description(table).
+        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+        set_timestamp(time(0));
+
+    // send embed as reply
+    event.reply(dpp::message(event.command.channel_id, embed).set_reference(event.command.message_id));
+
+}
+
 int main()
 {
     // time as seed for random generator used in addRandomXP();
@@ -82,7 +157,7 @@ int main()
     // message handler to look for a command called !ping ...
     bot.on_message_create([&bot](const dpp::message_create_t& event) {
         if (event.msg.content == "!rank" && event.msg.is_dm() == false) {
-            fridayFunc(event, bot);
+            event.reply("use /rank");
         }
         if (event.msg.content == "!ping") {
             event.reply("Pong!");
@@ -120,24 +195,25 @@ int main()
             dpp::interaction interaction = event.command;
             dpp::command_interaction cmd_data = interaction.get_command_interaction();
             auto subcommand = cmd_data.options.at(0);
-            if (subcommand.name == "Member") {
+            if (subcommand.name == "animal") {
                 if (!subcommand.options.empty()) {
-                    event.reply("> XP: " + std::to_string(getXP(event.command.get_issuing_user())));
+                    rankEmbed(event);
                 }
                 else {
-                    event.reply("XP: "+std::to_string(getXP(event.command.get_issuing_user())));
+                    rankEmbed(event);
                 }
             }
             else
-                event.reply("XP: " + std::to_string(getXP(event.command.get_issuing_user())));
+                rankEmbed(event);
         }
         if (event.command.get_command_name() == "topranks")
         {
-
+            topRanksEmbed(event);
         }
 
     });
 
+    setDatabase(loadData());
 
     bot.start(true);
 
@@ -166,7 +242,7 @@ int main()
         #endif
 
         sec++;
-        if (sec == 2)
+        if (sec == 24)
         {
             sec = 0;
 

@@ -4,4 +4,4 @@
 #include <fstream>
 
 void saveData(std::vector<UserXP*> UserXPs);
-std::vector<UserXP*> loadData(std::vector<UserXP*> UserXPs);
+std::vector<UserXP*> loadData();

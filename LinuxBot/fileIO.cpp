@@ -2,55 +2,55 @@
 #include "event.h"
 #include <iostream>
 
-void merge(std::vector<UserXP*> a, std::vector<UserXP*> b)
+std::vector<UserXP*> loadData()
 {
-
-};
-
-std::vector<UserXP*> loadData(std::vector<UserXP*> UserXPs)
-{
-	UserXPs.clear();
+	std::vector<UserXP*> load;
 
 	std::ifstream myfile;
-	std::string tmp = "./XPdata.cfg";
-	myfile.open(tmp.c_str(), std::ifstream::in);
+	myfile.open("./XPdata.cfg", std::ifstream::in);
 	std::string line;
 	if (myfile)
 	{
 		getline(myfile, line);
-		if (line != "\n")
+		while (line != "&end")
 		{
 			UserXP* newUserXP = new UserXP;
-			newUserXP->user.id = stoi(line);
+			newUserXP->userID = stoull(line);
 			getline(myfile, line);
-			newUserXP->xp = stoi(line);
+			newUserXP->xp = stoull(line);
+			getline(myfile, line);
+			newUserXP->lvl = stoi(line);
+			getline(myfile, line);
+			newUserXP->sielent = stoi(line);
+			getline(myfile, line);
 
-			UserXPs.push_back(newUserXP);
+			load.push_back(newUserXP);
 		}
 	}
 	else
 	{
-		printf("Could not load database");
+		printf("Could not load database\n");
 	}
-
-	return UserXPs;
+	return load;
 }
 
 void saveData(std::vector<UserXP*> UserXPs)
 {
 	std::ofstream myfile;
-	std::string tmp = "./XPdata.cfg";
-	myfile.open(tmp.c_str(), std::ofstream::out);
+	myfile.open("./XPdata.cfg", std::ofstream::out);
 	std::string line;
 	if (myfile)
 	{
 		for (auto i = 0; i < UserXPs.size(); i++)
-			myfile << UserXPs.at(i)->user.id << "\n" << UserXPs.at(i)->xp;
+			myfile << UserXPs.at(i)->userID << "\n" << UserXPs.at(i)->xp<< "\n"<<UserXPs.at(i)->lvl<<"\n"<<UserXPs.at(i)->sielent<<"\n";
 	
+		myfile << "&end\n";
 		myfile.close();
+
+		//printf("saved\n");
 	}
 	else
 	{
-		printf("Could not save database");
+		printf("Could not save database\n");
 	}
 }
