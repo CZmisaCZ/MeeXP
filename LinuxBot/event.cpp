@@ -140,10 +140,7 @@ RankData getRank(unsigned long long ID)
 	unsigned long long nextLVL = getXPforLvl(UserXPs.at(num)->lvl + 1);
 	unsigned long long currLVL = getXPforLvl(UserXPs.at(num)->lvl);
 
-	float procet = (currLVL - nextLVL) / (UserXPs.at(num)->xp - currLVL);
-	
-
-	return RankData(ID, UserXPs.at(num)->xp, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
+	return RankData(ID, UserXPs.at(num)->xp, currLVL, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
 }
 
 std::vector<UserXP*> getDatabase()

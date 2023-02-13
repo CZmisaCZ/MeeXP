@@ -45,14 +45,50 @@ void rankEmbed(dpp::slashcommand_t event)
 
     std::string desc;
 
-    desc = "__" + event.command.get_issuing_user().get_mention() + "__\n" +
-        "rank: " + std::to_string(data.rank) + "# *out of " + std::to_string(data.maxrank) + " total users*\n\n";
+    desc = "__" + event.command.get_issuing_user().get_mention() + "__\n\n" +
+        "Rank: **" + std::to_string(data.rank) + "#**\n" +
+        "Level: **" + std::to_string(data.lvl) + " **\n\n";
 
-    //█▉▊▋▌▍▎▏░▒▓
+    desc += "**[";
 
-    desc += "level: " + std::to_string(data.lvl) + "\n" +
-        "total xp: " + std::to_string(data.xp) + "\n"
-        "xp needed for level up: " + std::to_string(data.xptonextlvl) + "\n";
+    float bars = ((float)(data.xp - data.xptothislvl) / (float)(data.xptonextlvl - data.xptothislvl))*10.0f;
+    //generate bar
+    for (auto i = 0; i < 10; i++)
+    {
+        if (bars >= 1)
+        {
+            bars += -1;
+            desc += ":yellow_square:";
+        }
+        else if (bars > 0)
+        {
+            if (bars > 0.75f)
+            {
+                desc += ":white_large_square:";
+            }
+            else if (bars > 0.50f)
+            {
+                desc += ":white_medium_square:";
+            }
+            else if (bars > 0.25f)
+            {
+                desc += ":white_medium_small_square:";
+            }
+            else
+            {
+                desc += ":white_small_square:";
+            }
+            bars = 0;
+        }
+        else
+        {
+            desc += ":black_large_square:";
+        }
+    }
+
+    desc += "]**\n";
+
+    desc += "*"+std::to_string(data.xp) + "xp / " + std::to_string(data.xptonextlvl) + "xp*\n";
 
 
     //create embed
@@ -155,8 +191,9 @@ int main()
 
             dpp::slashcommand rankcommand("rank", "Get your or anouther members rank.", bot.me.id);
             rankcommand.add_option(
-                dpp::command_option(dpp::co_mentionable, "Member", "optional", false)
+                dpp::command_option(dpp::co_user, "user", "Mention user. (optional)",false)
             );
+
             bot.global_command_create(rankcommand);
 
             bot.global_command_create(dpp::slashcommand("topranks", "Show a list of members with highest ranks.", bot.me.id));
@@ -176,19 +213,7 @@ int main()
         }
         if (event.command.get_command_name() == "rank")
         {
-            dpp::interaction interaction = event.command;
-            dpp::command_interaction cmd_data = interaction.get_command_interaction();
-            auto subcommand = cmd_data.options.at(0);
-            if (subcommand.name == "Member") {
-                if (!subcommand.options.empty()) {
-                    rankEmbed(event);
-                }
-                else {
-                    rankEmbed(event);
-                }
-            }
-            else
-                rankEmbed(event);
+            rankEmbed(event);
         }
         if (event.command.get_command_name() == "topranks")
         {
