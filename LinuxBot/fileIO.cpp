@@ -82,6 +82,8 @@ std::vector<UserXP*> loadData()
 			getline(myfile, line);
 			newUserXP->xp = stoull(line);
 			getline(myfile, line);
+			newUserXP->messages = stoull(line);
+			getline(myfile, line);
 			newUserXP->lvl = stoi(line);
 			getline(myfile, line);
 			newUserXP->sielent = stoi(line);
@@ -117,7 +119,7 @@ void saveData(std::vector<UserXP*> UserXPs, unsigned long long time)
 		myfile << std::to_string(time)+"\n";
 
 		for (auto i = 0; i < UserXPs.size(); i++)
-			myfile << UserXPs.at(i)->userID << "\n" << UserXPs.at(i)->xp<< "\n"<<UserXPs.at(i)->lvl<<"\n"<<UserXPs.at(i)->sielent<<"\n";
+			myfile << UserXPs.at(i)->userID << "\n" << UserXPs.at(i)->xp<<"\n"<< UserXPs.at(i)->messages << "\n" << UserXPs.at(i)->lvl << "\n" << UserXPs.at(i)->sielent << "\n";
 	
 		myfile << "&end\n";
 		myfile.close();

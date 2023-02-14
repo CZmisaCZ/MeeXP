@@ -52,7 +52,7 @@ void addUser(unsigned long long ID)
 	}
 	else
 	{
-		printf(("user database is full, limit: " + std::to_string(18446744073709551615) + "\n").c_str());
+		if (sett::print)printf("user database is full, limit18446744073709551615\n");
 	}
 }
 
@@ -89,6 +89,7 @@ bool addXP(dpp::user user)
 			{
 				UserXPs.at(i)->updated = true;
 				addRandomXP(i);
+				if (UserXPs.at(i)->messages< 18446744073709551615)UserXPs.at(i)->messages++;else printf(("user " + std::to_string(UserXPs.at(i)->userID)+ " has reached meessages limit: 18446744073709551615\n").c_str());
 				return checkLvlUp(i);
 			}
 		}

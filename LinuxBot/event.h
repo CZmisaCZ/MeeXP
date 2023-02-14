@@ -9,6 +9,7 @@ struct UserXP
 {
 	unsigned long long userID;
 	unsigned long long xp = 0;
+	unsigned long long messages = 0;
 	short lvl = 0;
 	bool sielent = sett::sielent;
 	bool updated = 0;
