@@ -33,14 +33,17 @@ bool checkLvlUp(int at)
 // adds XP to user unsing his positin in <vector>UserXPs, mee6 bot like XP calculation
 void addRandomXP(int at)
 {
-	UserXPs.at(at)->xp += 15 + rand() % 10;
+	if (UserXPs.at(at)->xp < 18446744073709551615-25)
+		UserXPs.at(at)->xp += 15 + rand() % 10;
+	else
+		printf(("user: " + std::to_string(UserXPs.at(at)->userID) + " has reached xp limit, what a no lifer.\n").c_str());
 }
 
 // add user to database
-void addUser(unsigned long long a)
+void addUser(unsigned long long ID)
 {
 	UserXP* newUserXP = new UserXP;
-	newUserXP->userID = a;
+	newUserXP->userID = ID;
 
 	UserXPs.push_back(newUserXP);
 }
@@ -115,19 +118,27 @@ std::vector<UserXP*> getTopDatabase(short howmany)
 }
 
 //use user ID to find him in database and funcion returns "RankData" that are all nescessary data for building embeds or messages
-RankData getRank(unsigned long long ID)
+RankData getRank(dpp::user user)
 {
 	//get user pos in database using ID
 	bool loop = true;
 	auto num = 0;
 	for (auto i = 0; i < UserXPs.size() && loop == true; i++)
-		if (UserXPs.at(i)->userID == ID) { num = i; loop = false; }
+		if (UserXPs.at(i)->userID == user.id) { num = i; loop = false; }
 
 	//if user not found then add new
 	if (loop == true)
 	{
-		num = UserXPs.size();
-		addUser(ID);
+		if (user.is_bot() == false)
+		{
+			num = UserXPs.size();
+			addUser(user.id);
+		}
+		else
+		{
+			// if bot retrun "empty"
+			return RankData(user.id, 0, 0, 0, 0, UserXPs.size(), 0);
+		}
 	}
 
 	//calc user rank
@@ -140,7 +151,7 @@ RankData getRank(unsigned long long ID)
 	unsigned long long nextLVL = getXPforLvl(UserXPs.at(num)->lvl + 1);
 	unsigned long long currLVL = getXPforLvl(UserXPs.at(num)->lvl);
 
-	return RankData(ID, UserXPs.at(num)->xp, currLVL, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
+	return RankData(user.id, UserXPs.at(num)->xp, currLVL, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
 }
 
 std::vector<UserXP*> getDatabase()

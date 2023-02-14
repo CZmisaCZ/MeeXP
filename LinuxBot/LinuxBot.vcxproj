@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="event.h" />
     <ClInclude Include="fileIO.h" />
+    <ClInclude Include="settings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="XPdata.cfg" />

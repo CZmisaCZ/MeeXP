@@ -41,4 +41,4 @@ unsigned long long getXP(dpp::user user);
 void applyXP();
 void setDatabase(std::vector<UserXP*> data);
 std::vector<UserXP*> getTopDatabase(short howmany);
-RankData getRank(unsigned long long ID);
+RankData getRank(dpp::user user);

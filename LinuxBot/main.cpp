@@ -24,28 +24,38 @@ unsigned int microsecond = 250000;//250ms
 
 #endif
 
-void levelupEmbed(dpp::message_create_t event, dpp::cluster& bot)
+void levelupEmbed(dpp::message_create_t message)
 {
-    //create embed
-    dpp::embed embed = dpp::embed().
-        set_color(dpp::colors::sti_blue).
-        set_title("***LEVEL UP***").
-
-        set_image("https://cdn.discordapp.com/attachments/656751148379668500/1013462947906994229/today-is.gif").
-        set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
-        set_timestamp(time(0));
-
-    // send embed as reply
-    bot.message_create(dpp::message(event.msg.channel_id, embed).set_reference(event.msg.id));
-}
-
-void rankEmbed(dpp::slashcommand_t event)
-{
-    RankData data = getRank(event.command.get_issuing_user().id);
+    RankData data = getRank(message.msg.author);
 
     std::string desc;
 
-    desc = "__" + event.command.get_issuing_user().get_mention() + "__\n\n" +
+    desc = "***YEEEHAAAW*** " + message.msg.author.get_mention() + ", reached "+std::to_string(data.lvl) + ". level\n\n" +
+        "Rank: **" + std::to_string(data.rank) + "#**\n" +
+        "Level: **" + std::to_string(data.lvl) + " **\n\n";
+
+    desc += "**[:yellow_square::yellow_square::yellow_square::yellow_square::yellow_square::yellow_square::yellow_square::yellow_square::yellow_square::yellow_square:]**\n";
+
+    desc += "*" + std::to_string(data.xp) + "xp / " + std::to_string(data.xptothislvl) + "xp*\n";
+
+    //create embed
+    dpp::embed embed = dpp::embed().
+        set_color(dpp::colors::moon_yellow).
+        set_description(desc).
+        set_footer(dpp::embed_footer().set_text("let's do this texas style !").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
+        set_timestamp(time(0));
+
+    // send embed as reply
+    message.reply(dpp::message(message.msg.channel_id, embed).set_reference(message.msg.id));
+}
+
+void rankEmbed(dpp::slashcommand_t event, dpp::user user)
+{
+    RankData data = getRank(user);
+
+    std::string desc;
+
+    desc = "__" + user.get_mention() + "__\n\n" +
         "Rank: **" + std::to_string(data.rank) + "#**\n" +
         "Level: **" + std::to_string(data.lvl) + " **\n\n";
 
@@ -90,6 +100,7 @@ void rankEmbed(dpp::slashcommand_t event)
 
     desc += "*"+std::to_string(data.xp) + "xp / " + std::to_string(data.xptonextlvl) + "xp*\n";
 
+    if (user.is_bot() == true)desc += "***bots dont get XP or levels***";
 
     //create embed
     dpp::embed embed = dpp::embed().
@@ -170,7 +181,7 @@ int main()
     // message handler to look for a command called !ping ...
     bot.on_message_create([&bot](const dpp::message_create_t& event) {
         if (event.msg.content == "!rank" && event.msg.is_dm() == false) {
-            event.reply("use /rank");
+            event.reply("Use: /rank");
         }
         if (event.msg.content == "!ping") {
             event.reply("Pong!");
@@ -178,7 +189,7 @@ int main()
 
         if (addXP(event.msg.author))
         {
-            levelupEmbed(event, bot);
+            levelupEmbed(event);
         }
 
     });
@@ -196,9 +207,15 @@ int main()
 
             bot.global_command_create(rankcommand);
 
-            bot.global_command_create(dpp::slashcommand("topranks", "Show a list of members with highest ranks.", bot.me.id));
+            bot.global_command_create(dpp::slashcommand("levels", "Show a list of members with highest ranks.", bot.me.id));
 
-            bot.global_command_create(dpp::slashcommand("xpneed", "Show how many xp do you need for ranks form 0 to 100.", bot.me.id));
+            //bot.global_command_create(dpp::slashcommand("xpneed", "Show how many xp do you need for ranks form 0 to 100.", bot.me.id));
+
+            dpp::slashcommand rankcommand("setxp", "Sets xp of user (this will overrite their XP and level), admin only command.", bot.me.id);
+            rankcommand.add_option(
+                dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true).
+                add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true))
+            );
 
             bot.global_command_create(dpp::slashcommand("silence", "Turn off level up messages for yourself.", bot.me.id));
         }
@@ -213,15 +230,23 @@ int main()
         }
         if (event.command.get_command_name() == "rank")
         {
-            rankEmbed(event);
+            //check if there is entered user
+            if (event.command.data._Storage()._Get().options.size() > 0)
+                rankEmbed(event, *dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))));
+            else
+                rankEmbed(event, event.command.get_issuing_user());
         }
-        if (event.command.get_command_name() == "topranks")
+        if (event.command.get_command_name() == "levels")
         {
             topRanksEmbed(event);
         }
         if (event.command.get_command_name() == "xpneed")
         {
             xpNeededEmbed(event);
+        }
+        if (event.command.get_command_name() == "setxp")
+        {
+            event.reply(":thumbsup:");
         }
 
     });
@@ -260,7 +285,7 @@ int main()
             sec = 0;
 
             applyXP();
-            saveData(getDatabase());
+            saveData(getDatabase(),-1);
         }
     };
 
