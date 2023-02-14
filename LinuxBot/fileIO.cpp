@@ -1,5 +1,7 @@
 #include "fileIO.h"
 #include "settings.h"
+#include <iostream>
+#include <climits>
 
 bool is_empty(std::ifstream& pFile)
 {
@@ -17,7 +19,7 @@ int whichone(bool leatest)
 
 	std::ifstream myfile;
 
-	for (auto i = 0; i < sett::gackupsnumber; i++)
+	for (auto i = 0; i < sett::backupsnumber; i++)
 	{
 		myfile.open("./data/"+std::to_string(i)+".cfg", std::ifstream::in);
 
@@ -38,7 +40,7 @@ int whichone(bool leatest)
 			}
 			else
 			{
-				printf(("corrupted file: ./data/" + std::to_string(i) + ".cfg\nreplacing with empty one\n").c_str());
+				if(sett::print)printf(("corrupted file: ./data/" + std::to_string(i) + ".cfg\nreplacing with empty one\n").c_str());
 				std::ofstream myfile2;
 				myfile2.open("./data/" + std::to_string(i) + ".cfg", std::ofstream::out);
 				myfile2 << std::to_string(tmp)+"\n&end\n";
@@ -48,7 +50,7 @@ int whichone(bool leatest)
 		}
 		else
 		{
-			printf(("file missing: ./data/" + std::to_string(i) + ".cfg\nreplacing with empty one\n").c_str());
+			if(sett::print)printf(("file missing: ./data/" + std::to_string(i) + ".cfg\nreplacing with empty one\n").c_str());
 			std::ofstream myfile2;
 			myfile2.open("./data/" + std::to_string(i) + ".cfg", std::ofstream::out);
 			myfile2 << std::to_string(tmp) + "\n&end\n";
@@ -90,7 +92,7 @@ std::vector<UserXP*> loadData()
 	}
 	else
 	{
-		printf("Could not load database\n");
+		if(sett::print)printf("Could not load database\n");
 	}
 	return load;
 }
@@ -107,7 +109,7 @@ void saveData(std::vector<UserXP*> UserXPs, unsigned long long time)
 	if (time == -1) time = stoull(line);
 	myfile2.close();
 
-	time +=sett::gackupsnumber;
+	time +=sett::backupsnumber;
 	std::ofstream myfile;
 	myfile.open("./data/"+std::to_string(filenum)+".cfg", std::ofstream::out);
 	if (myfile)
@@ -120,20 +122,20 @@ void saveData(std::vector<UserXP*> UserXPs, unsigned long long time)
 		myfile << "&end\n";
 		myfile.close();
 
-		//printf("saved\n");
+		//if(sett::print)printf("saved\n");
 	}
 	else
 	{
-		printf("Could not save database\n");
+		if(sett::print)printf("Could not save database\n");
 	}
 
-	if (time >= 18000000000000000000 - sett::gackupsnumber)ressetFileDates();
+	if (time >= 18000000000000000000 - sett::backupsnumber)ressetFileDates();
 }
 
 // reset file dates funciton, to avoid file date owerflow
 void ressetFileDates()
 {
-	for (auto i = 0; i < sett::gackupsnumber; i++)
+	for (auto i = 0; i < sett::backupsnumber; i++)
 	{
 		saveData(loadData(),i);
 	}

@@ -3,13 +3,14 @@
 #include <vector>
 #include <string>
 #include <dpp/dpp.h>
+#include "settings.h"
 
 struct UserXP
 {
 	unsigned long long userID;
 	unsigned long long xp = 0;
 	short lvl = 0;
-	bool sielent = 0;
+	bool sielent = sett::sielent;
 	bool updated = 0;
 };
 
@@ -42,3 +43,7 @@ void applyXP();
 void setDatabase(std::vector<UserXP*> data);
 std::vector<UserXP*> getTopDatabase(short howmany);
 RankData getRank(dpp::user user);
+void giveXP(dpp::user user, double XP);
+void setXP(dpp::user user, double XP);
+void sielence(dpp::user user);
+bool ismoderator(dpp::user user);

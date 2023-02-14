@@ -2,7 +2,6 @@
 
 #include "event.h"
 #include <fstream>
-#include <iostream>
 
 void saveData(std::vector<UserXP*> UserXPs, unsigned long long time);
 std::vector<UserXP*> loadData();

@@ -1,6 +1,7 @@
 #include "event.h"
 #include "fileIO.h"
 #include <iostream>
+#include "settings.h"
 
 std::vector<UserXP*> UserXPs;
 
@@ -18,7 +19,7 @@ unsigned long long getXPforLvl(short lvl)
 }
 
 // checks if user has enough xp for lvl up, if yes then increases level and returns 1 else retrun 0
-bool checkLvlUp(int at)
+bool checkLvlUp(unsigned long long at)
 {
 	if (UserXPs.at(at)->xp >= getXPforLvl(UserXPs.at(at)->lvl+1))
 	{
@@ -31,21 +32,50 @@ bool checkLvlUp(int at)
 }
 
 // adds XP to user unsing his positin in <vector>UserXPs, mee6 bot like XP calculation
-void addRandomXP(int at)
+void addRandomXP(unsigned long long at)
 {
-	if (UserXPs.at(at)->xp < 18446744073709551615-25)
-		UserXPs.at(at)->xp += 15 + rand() % 10;
+	if (UserXPs.at(at)->xp < 18446744073709551615-(25*sett::globalxpmultiplayer))
+		UserXPs.at(at)->xp += (15 + rand() % 10) * sett::globalxpmultiplayer;
 	else
-		printf(("user: " + std::to_string(UserXPs.at(at)->userID) + " has reached xp limit, what a no lifer.\n").c_str());
+		if(sett::print)printf(("user: " + std::to_string(UserXPs.at(at)->userID) + " has reached xp limit, what a no lifer.\n").c_str());
 }
 
 // add user to database
 void addUser(unsigned long long ID)
 {
-	UserXP* newUserXP = new UserXP;
-	newUserXP->userID = ID;
+	if (UserXPs.size()==18446744073709551615)
+	{
+		UserXP* newUserXP = new UserXP;
+		newUserXP->userID = ID;
 
-	UserXPs.push_back(newUserXP);
+		UserXPs.push_back(newUserXP);
+	}
+	else
+	{
+		printf(("user database is full, limit: " + std::to_string(18446744073709551615) + "\n").c_str());
+	}
+}
+
+//get user pos in database using ID
+unsigned long long finduserAT(dpp::user user)
+{
+	//get user pos in database using ID
+	bool loop = true;
+	auto num = 0;
+	for (auto i = 0; i < UserXPs.size() && loop == true; i++)
+		if (UserXPs.at(i)->userID == user.id) { num = i; loop = false; }
+
+	//if user not found then add new
+	if (loop == true)
+	{
+		if (user.is_bot() == false)
+		{
+			num = UserXPs.size();
+			addUser(user.id);
+		}
+	}
+
+	return num;
 }
 
 // add user to list that is waiting for adding XP
@@ -107,8 +137,16 @@ std::vector<UserXP*> getTopDatabase(short howmany)
 		{
 			if (UserXPs.at(ii)->xp >= current)
 			{
-				current = UserXPs.at(ii)->xp;
-				top.at(i) = UserXPs.at(ii);
+				bool thereisone = false;
+				for (auto iii = 0; iii < top.size(); iii++)
+				{
+					if (UserXPs.at(ii)->userID == top.at(iii)->userID)thereisone = true;
+				}
+				if (thereisone == false)
+				{
+					current = UserXPs.at(ii)->xp;
+					top.at(i) = UserXPs.at(ii);
+				}
 			}
 		}
 		current = 0;
@@ -162,4 +200,61 @@ std::vector<UserXP*> getDatabase()
 void setDatabase(std::vector<UserXP*> data)
 {
 	UserXPs = data;
+}
+
+void setXP(dpp::user user, double XP)
+{
+	//to prevent giving negative xp
+	if (XP < 0)XP = 0;
+
+	//get user pos in database using ID
+	auto num = finduserAT(user);
+
+	if (user.is_bot() == false)
+	{
+		//sets desired xp and resets lvl
+		UserXPs.at(num)->xp = XP;
+		UserXPs.at(num)->lvl = 0;
+
+		//gives lvls back, based on given xp
+		while (UserXPs.at(num)->xp >= getXPforLvl(UserXPs.at(num)->lvl + 1))
+			UserXPs.at(num)->lvl++;
+	}
+}
+
+void giveXP(dpp::user user, double XP)
+{
+	//to prevent giving negative xp
+	if (XP < 0)XP = 0;
+
+	//get user pos in database using ID
+	auto num = finduserAT(user);
+
+	if (XP + UserXPs.at(num)->xp < 0)
+	if (user.is_bot() == false)
+	{
+		//sets desired xp and resets lvl
+		UserXPs.at(num)->xp = XP + UserXPs.at(num)->xp;
+		UserXPs.at(num)->lvl = 0;
+
+		//gives lvls back, based on given xp
+		while (UserXPs.at(num)->xp >= getXPforLvl(UserXPs.at(num)->lvl + 1))
+			UserXPs.at(num)->lvl++;
+	}
+}
+
+void sielence(dpp::user user)
+{
+	unsigned long long at = finduserAT(user);
+
+	if (UserXPs.at(at)->sielent == true)UserXPs.at(at)->sielent = false; else UserXPs.at(at)->sielent = true;
+}
+
+bool ismoderator(dpp::user user)
+{
+	for (auto i = 0; i < sett::admins.size(); i++)
+		if (user.id == sett::admins.at(i))
+			return true;
+
+	return false;
 }

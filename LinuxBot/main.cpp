@@ -1,12 +1,11 @@
 ﻿#include <dpp/dpp.h>
 
-const std::string BOT_TOKEN = "MTAxMzcyOTk2ODI2NzczNTA4MA.GSCbqc.QvfAw-mae5Tl3ZXEXNNHvNgtLtwYNZ6kRozREA";
-
 #include <string>
 #include <stdio.h>
 #include <time.h>
 #include "fileIO.h"
 #include "event.h"
+#include "settings.h"
 
 #ifdef linux
 
@@ -150,14 +149,14 @@ void topRanksEmbed(dpp::slashcommand_t event)
         dpp::user a;
         a.id = top.at(i)->userID;
         
-        table = table + std::to_string(top.at(i)->xp) + "xp " + a.get_mention() + "\n";
+        table = table + "**" +std::to_string(i+1) + "#** " + a.get_mention() + " " + std::to_string(top.at(i)->xp) + "xp\n";
     }
 
     //create embed
     dpp::embed embed = dpp::embed().
         set_color(dpp::colors::moon_yellow).
-        set_title("__top users__").
-        set_url("https://docs.google.com/spreadsheets/d/10s70KvJEFxrwb-bulRzP-r17Z6ZdSnH7lH5AV_DC0bM/edit#gid=0").
+        set_title("__Top Ranks__").
+        //set_url("https://docs.google.com/spreadsheets/d/10s70KvJEFxrwb-bulRzP-r17Z6ZdSnH7lH5AV_DC0bM/edit#gid=0").
         set_description(table).
         set_footer(dpp::embed_footer().set_text("gaming").set_icon("https://cdn.discordapp.com/attachments/656751148379668500/1013464958429839410/every_secon.gif")).
         set_timestamp(time(0));
@@ -173,10 +172,10 @@ int main()
     srand(time(NULL));
 
     // create bot cluster
-    dpp::cluster bot(BOT_TOKEN, dpp::i_default_intents | dpp::i_message_content);
+    dpp::cluster bot(sett::BOT_TOKEN, dpp::i_default_intents | dpp::i_message_content);
 
     // output simple log messages to stdout
-    bot.on_log(dpp::utility::cout_logger());
+    if (sett::print)bot.on_log(dpp::utility::cout_logger());
 
     // message handler to look for a command called !ping ...
     bot.on_message_create([&bot](const dpp::message_create_t& event) {
@@ -189,7 +188,7 @@ int main()
 
         if (addXP(event.msg.author))
         {
-            levelupEmbed(event);
+            //levelupEmbed(event);
         }
 
     });
@@ -204,18 +203,16 @@ int main()
             rankcommand.add_option(
                 dpp::command_option(dpp::co_user, "user", "Mention user. (optional)",false)
             );
-
             bot.global_command_create(rankcommand);
 
             bot.global_command_create(dpp::slashcommand("levels", "Show a list of members with highest ranks.", bot.me.id));
 
             //bot.global_command_create(dpp::slashcommand("xpneed", "Show how many xp do you need for ranks form 0 to 100.", bot.me.id));
 
-            dpp::slashcommand rankcommand("setxp", "Sets xp of user (this will overrite their XP and level), admin only command.", bot.me.id);
-            rankcommand.add_option(
-                dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true).
-                add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true))
-            );
+            dpp::slashcommand setxpcommand("setxp", "Sets xp of user (this will overrite their XP and level), admin only command.", bot.me.id);
+            setxpcommand.add_option(dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true));
+            setxpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
+            bot.global_command_create(setxpcommand);
 
             bot.global_command_create(dpp::slashcommand("silence", "Turn off level up messages for yourself.", bot.me.id));
         }
@@ -230,8 +227,12 @@ int main()
         }
         if (event.command.get_command_name() == "rank")
         {
-            //check if there is entered user
-            if (event.command.data._Storage()._Get().options.size() > 0)
+            // check if there is "user" imput
+            dpp::interaction interaction = event.command;
+            dpp::command_interaction cmd_data = interaction.get_command_interaction();
+            bool subcommand = cmd_data.options.size();
+
+            if (subcommand)
                 rankEmbed(event, *dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))));
             else
                 rankEmbed(event, event.command.get_issuing_user());
@@ -244,9 +245,34 @@ int main()
         {
             xpNeededEmbed(event);
         }
+        if (event.command.get_command_name() == "silence")
+        {
+            sielence(event.command.get_issuing_user());
+            event.reply(":thumbsup:");
+        }
         if (event.command.get_command_name() == "setxp")
         {
-            event.reply(":thumbsup:");
+            if (ismoderator(event.command.get_issuing_user()))
+            {
+                setXP(*dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))), std::get<double>(event.get_parameter("xp")));
+                event.reply(":thumbsup:");
+            }
+            else
+            {
+                event.reply("This is admin only command.");
+            }
+        }
+        if (event.command.get_command_name() == "givexp")
+        {
+            if (ismoderator(event.command.get_issuing_user()))
+            {
+                giveXP(*dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))), std::get<double>(event.get_parameter("xp")));
+                event.reply(":thumbsup:");
+            }
+            else
+            {
+                event.reply("This is admin only command.");
+            }
         }
 
     });
@@ -263,7 +289,8 @@ int main()
     auto start = high_resolution_clock::now();
     #endif
 
-    int sec=0;
+    unsigned int min=0;
+    unsigned int tim=0;
 
     while (true)
     {
@@ -279,12 +306,18 @@ int main()
         }
         #endif
 
-        sec++;
-        if (sec == 4)
+        min++;
+        //apply xp every minute
+        if (min == 4*60)
         {
-            sec = 0;
+            tim++;
+            min = 0;
 
             applyXP();
+        }
+        //save every set time in settings (default 1 min)
+        if (tim == 4*60*sett::saveinterval)
+        {
             saveData(getDatabase(),-1);
         }
     };
