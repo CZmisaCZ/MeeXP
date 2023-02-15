@@ -194,6 +194,14 @@ RankData getRank(dpp::user user)
 	return RankData(user.id, UserXPs.at(num)->xp, currLVL, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
 }
 
+bool isUserInDatabase(uint64_t ID)
+{
+	for (auto i = 0; i < UserXPs.size(); i++)
+		if (UserXPs.at(i)->userID == ID)return 1;
+
+	return 0;
+}
+
 std::vector<UserXP*> getDatabase()
 {
 	return UserXPs;

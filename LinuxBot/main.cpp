@@ -217,7 +217,7 @@ int main()
             setxpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
             bot.global_command_create(setxpcommand);
 
-            dpp::slashcommand givexpcommand("setxp", "Gives xp to a user, admin only command.", bot.me.id);
+            dpp::slashcommand givexpcommand("givexp", "Gives xp to a user, admin only command.", bot.me.id);
             givexpcommand.add_option(dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true));
             givexpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
             bot.global_command_create(givexpcommand);
@@ -241,7 +241,13 @@ int main()
             bool subcommand = cmd_data.options.size();
 
             if (subcommand)
-                rankEmbed(event, *dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))));
+            {
+                uint64_t ID = std::get<dpp::snowflake>(event.get_parameter("user"));
+                if (isUserInDatabase(ID))
+                rankEmbed(event, *dpp::find_user(ID));
+                else
+                    event.reply("User has no XP.");
+            }
             else
                 rankEmbed(event, event.command.get_issuing_user());
         }
@@ -262,8 +268,16 @@ int main()
         {
             if (ismoderator(event.command.get_issuing_user()))
             {
-                setXP(*dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))), std::get<double>(event.get_parameter("xp")));
-                event.reply(":thumbsup:");
+                uint64_t ID = std::get<dpp::snowflake>(event.get_parameter("user"));
+                if (isUserInDatabase(ID))
+                {
+                    setXP(*dpp::find_user(ID), std::get<double>(event.get_parameter("xp")));
+                    event.reply(":thumbsup:");
+                }
+                else
+                {
+                    event.reply("User is not in database, user must type something first if you want to give him XP.");
+                }
             }
             else
             {
@@ -274,8 +288,16 @@ int main()
         {
             if (ismoderator(event.command.get_issuing_user()))
             {
-                giveXP(*dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))), std::get<double>(event.get_parameter("xp")));
-                event.reply(":thumbsup:");
+                uint64_t ID = std::get<dpp::snowflake>(event.get_parameter("user"));
+                if (isUserInDatabase(ID))
+                {
+                    giveXP(*dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))), std::get<double>(event.get_parameter("xp")));
+                    event.reply(":thumbsup:");
+                }
+                else
+                {
+                    event.reply("User is not in database, user must type something first if you want to give him XP.");
+                }
             }
             else
             {
