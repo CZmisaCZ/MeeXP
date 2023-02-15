@@ -4,7 +4,7 @@
 
 inline namespace sett
 {
-	inline const std::string BOT_TOKEN = "TOKEN";
+	inline const std::string BOT_TOKEN = "BOT TOKEN";
 	inline int backupsnumber = 3; //number of save backups, 3 is recommended
 	inline int saveinterval = 1; //save interval in minutes
 	inline std::vector<unsigned long long> admins = { 305444371883491329 };  //<------------------- list of admins discord IDs to use "/givexp"

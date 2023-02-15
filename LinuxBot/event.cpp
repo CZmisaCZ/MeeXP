@@ -237,7 +237,7 @@ void giveXP(dpp::user user, double XP)
 	//get user pos in database using ID
 	auto num = finduserAT(user);
 
-	if (XP + UserXPs.at(num)->xp < 0)
+	if (XP + UserXPs.at(num)->xp > 0)
 	if (user.is_bot() == false)
 	{
 		//sets desired xp and resets lvl
