@@ -17,6 +17,14 @@ g++ compiler, wget, unzip
 
 sudo apt install g++ unzip wget
 
+* DPP instalation:
+
+wget -O dpp.deb https://dl.dpp.dev/
+
+dpkg -i dpp.deb
+
+* libsodium instalation:
+
 wget https://download.libsodium.org/libsodium/releases/LATEST.tar.gz
 
 tar -xvzf LATEST.tar.gz -C .
