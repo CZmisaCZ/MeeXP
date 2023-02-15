@@ -31,3 +31,34 @@ sudo make install
 
 ### instalation:
 
+wget https://github.com/CZmisaCZ/Mee6like-XP-Bot/archive/refs/heads/master.zip
+
+unzip master.zip
+
+cd Mee6like-XP-Bot-master
+
+cd LinuxBot
+
+### configuring:
+
+nano settings.h
+
+In this file change: BOT TOKE to your bot token [how to get bot token](https://youtu.be/aI4OmIbkJH8).
+
+Change admins { DISCORD-USER-ID, DISCORD-USER-ID-2, DISCORD-USER-ID-3... } this is a list of admins that can use /givexp and /setxp, you can put there as many users as you want or leave it empty, its up to you.
+
+You can change other settings like save intervals, nuber of backups... therese are not as important.
+
+save and exit using: 
+
+Ctrl+X
+
+Y
+
+enter
+
+### compilation and start
+
+compile using: g++ -o3 -std=c++17 main.cpp fileIO.cpp event.cpp -o xpbot -ldpp
+
+start using: ./mybot
