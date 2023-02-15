@@ -11,11 +11,11 @@ DPP library [official site / documentation](https://dpp.dev/install-linux-deb.ht
 
 libsodium library [official site / documentation](https://doc.libsodium.org/)
 
-g++ compiler
+g++ compiler, wget, unzip
 
 ### requirements instalation:
 
-sudo apt install g++
+sudo apt install g++ unzip wget
 
 wget https://download.libsodium.org/libsodium/releases/LATEST.tar.gz
 
