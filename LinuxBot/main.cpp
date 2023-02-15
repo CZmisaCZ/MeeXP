@@ -7,7 +7,7 @@
 #include "event.h"
 #include "settings.h"
 
-#ifdef linux
+#ifdef __unix__
 
 #include <unistd.h>
 unsigned int microsecond = 250000;//250ms
@@ -217,6 +217,11 @@ int main()
             setxpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
             bot.global_command_create(setxpcommand);
 
+            dpp::slashcommand givexpcommand("setxp", "Gives xp to a user, admin only command.", bot.me.id);
+            givexpcommand.add_option(dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true));
+            givexpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
+            bot.global_command_create(givexpcommand);
+
             bot.global_command_create(dpp::slashcommand("silence", "Turn off level up messages for yourself.", bot.me.id));
         }
     });
@@ -303,7 +308,7 @@ int main()
         }
         #endif
 
-        #ifdef linux
+        #ifdef __unix__
         {
             usleep(microsecond);
         }

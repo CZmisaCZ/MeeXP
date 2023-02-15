@@ -2,6 +2,7 @@
 #include "fileIO.h"
 #include <iostream>
 #include "settings.h"
+#include <cstdint> // for uint64_t
 
 std::vector<UserXP*> UserXPs;
 
@@ -34,7 +35,7 @@ bool checkLvlUp(unsigned long long at)
 // adds XP to user unsing his positin in <vector>UserXPs, mee6 bot like XP calculation
 void addRandomXP(unsigned long long at)
 {
-	if (UserXPs.at(at)->xp < 18446744073709551615-(25*sett::globalxpmultiplayer))
+	if (UserXPs.at(at)->xp < (uint64_t)18446744073709551615-(25*sett::globalxpmultiplayer))
 		UserXPs.at(at)->xp += (15 + rand() % 10) * sett::globalxpmultiplayer;
 	else
 		if(sett::print)printf(("user: " + std::to_string(UserXPs.at(at)->userID) + " has reached xp limit, what a no lifer.\n").c_str());
@@ -43,7 +44,7 @@ void addRandomXP(unsigned long long at)
 // add user to database
 void addUser(unsigned long long ID)
 {
-	if (UserXPs.size()!=18446744073709551615)
+	if (UserXPs.size()!= (uint64_t)18446744073709551615)
 	{
 		UserXP* newUserXP = new UserXP;
 		newUserXP->userID = ID;
@@ -89,7 +90,7 @@ bool addXP(dpp::user user)
 			{
 				UserXPs.at(i)->updated = true;
 				addRandomXP(i);
-				if (UserXPs.at(i)->messages< 18446744073709551615)UserXPs.at(i)->messages++;else printf(("user " + std::to_string(UserXPs.at(i)->userID)+ " has reached meessages limit: 18446744073709551615\n").c_str());
+				if (UserXPs.at(i)->messages< (uint64_t)18446744073709551615)UserXPs.at(i)->messages++;else printf(("user " + std::to_string(UserXPs.at(i)->userID)+ " has reached meessages limit: 18446744073709551615\n").c_str());
 				return checkLvlUp(i);
 			}
 		}
@@ -225,9 +226,6 @@ void setXP(dpp::user user, double XP)
 
 void giveXP(dpp::user user, double XP)
 {
-	//to prevent giving negative xp
-	if (XP < 0)XP = 0;
-
 	//get user pos in database using ID
 	auto num = finduserAT(user);
 

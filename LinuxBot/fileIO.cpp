@@ -1,7 +1,8 @@
 #include "fileIO.h"
 #include "settings.h"
 #include <iostream>
-#include <climits>
+#include <climits> //for INT_MAX
+#include <cstdint> //for uint64_t
 
 bool is_empty(std::ifstream& pFile)
 {
@@ -100,7 +101,7 @@ std::vector<UserXP*> loadData()
 }
 
 //file time is used for number that tracks which file was saved leatest, -1 = default
-void saveData(std::vector<UserXP*> UserXPs, unsigned long long time)
+void saveData(std::vector<UserXP*> UserXPs, uint64_t time)
 {
 	unsigned long long filenum = whichone(false);
 
@@ -131,7 +132,7 @@ void saveData(std::vector<UserXP*> UserXPs, unsigned long long time)
 		if(sett::print)printf("Could not save database\n");
 	}
 
-	if (time >= 18000000000000000000 - sett::backupsnumber)ressetFileDates();
+	if (time >= (uint64_t)18000000000000000000 - sett::backupsnumber)ressetFileDates();
 }
 
 // reset file dates funciton, to avoid file date owerflow
