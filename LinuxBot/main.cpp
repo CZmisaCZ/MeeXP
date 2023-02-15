@@ -179,16 +179,19 @@ int main()
 
     // message handler to look for a command called !ping ...
     bot.on_message_create([&bot](const dpp::message_create_t& event) {
+
         if (event.msg.content == "!rank" && event.msg.is_dm() == false) {
             event.reply("Use: /rank");
         }
+
         if (event.msg.content == "!ping") {
             event.reply("Pong!");
         }
 
         if (addXP(event.msg.author))
         {
-            //levelupEmbed(event);
+            if (issielent(event.msg.author)==false)
+            levelupEmbed(event);
         }
 
     });

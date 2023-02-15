@@ -4,7 +4,7 @@
 
 inline namespace sett
 {
-	inline const std::string BOT_TOKEN = "MTA3NTE4Mzc1OTg4NTg4MTQzNg.GL-k1e.WKhu4OHOvPiG4HDqxSPUOGD-j758gHZT-O39vA"; //test bot MTAxMzcyOTk2ODI2NzczNTA4MA.GXygRr.4S02cZkZRmf9TggZVnLBNJa0UO2sTMnYmMudJ0
+	inline const std::string BOT_TOKEN = "BOT TOKEN";
 	inline int backupsnumber = 3; //number of save backups, 3 is recommended
 	inline int saveinterval = 1; //save interval in minutes
 	inline std::vector<unsigned long long> admins = { 305444371883491329 }; //not used yet

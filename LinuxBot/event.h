@@ -47,4 +47,5 @@ RankData getRank(dpp::user user);
 void giveXP(dpp::user user, double XP);
 void setXP(dpp::user user, double XP);
 void sielence(dpp::user user);
+bool issielent(dpp::user user);
 bool ismoderator(dpp::user user);

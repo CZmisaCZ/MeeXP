@@ -43,7 +43,7 @@ void addRandomXP(unsigned long long at)
 // add user to database
 void addUser(unsigned long long ID)
 {
-	if (UserXPs.size()==18446744073709551615)
+	if (UserXPs.size()!=18446744073709551615)
 	{
 		UserXP* newUserXP = new UserXP;
 		newUserXP->userID = ID;
@@ -52,7 +52,7 @@ void addUser(unsigned long long ID)
 	}
 	else
 	{
-		if (sett::print)printf("user database is full, limit18446744073709551615\n");
+		if (sett::print)printf("user database is full, limit: 18446744073709551615\n");
 	}
 }
 
@@ -184,7 +184,7 @@ RankData getRank(dpp::user user)
 	auto rank = 1;
 	for (auto i = 0; i < UserXPs.size(); i++)
 	{
-		if (UserXPs.at(i)->xp < UserXPs.at(num)->xp)rank++;
+		if (UserXPs.at(i)->xp > UserXPs.at(num)->xp)rank++;
 	}
 
 	unsigned long long nextLVL = getXPforLvl(UserXPs.at(num)->lvl + 1);
@@ -249,6 +249,11 @@ void sielence(dpp::user user)
 	unsigned long long at = finduserAT(user);
 
 	if (UserXPs.at(at)->sielent == true)UserXPs.at(at)->sielent = false; else UserXPs.at(at)->sielent = true;
+}
+
+bool issielent(dpp::user user)
+{
+	return UserXPs.at(finduserAT(user))->sielent;
 }
 
 bool ismoderator(dpp::user user)
