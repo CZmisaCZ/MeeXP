@@ -51,7 +51,7 @@ cd LinuxBot
 
 nano settings.h
 
-In this file change: BOT TOKE to your bot token [how to get bot token](https://youtu.be/aI4OmIbkJH8).
+In this file change: BOT TOKEN to your bot token [how to get bot token](https://youtu.be/aI4OmIbkJH8).
 
 Change admins { DISCORD-USER-ID, DISCORD-USER-ID-2, DISCORD-USER-ID-3... } this is a list of admins that can use /givexp and /setxp, you can put there as many users as you want or leave it empty, its up to you.
 
