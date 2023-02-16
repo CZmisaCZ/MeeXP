@@ -69,4 +69,4 @@ enter
 
 compile using: g++ -o3 -std=c++17 main.cpp fileIO.cpp event.cpp -o xpbot -ldpp
 
-start using: ./mybot
+start using: ./xpbot
