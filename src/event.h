@@ -49,4 +49,4 @@ void setXP(dpp::user user, double XP);
 void sielence(dpp::user user);
 bool issielent(dpp::user user);
 bool ismoderator(dpp::user user);
-bool isUserInDatabase(uint64_t ID);
+bool isUserInDatabase(unsigned long long ID);
