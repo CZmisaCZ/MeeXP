@@ -1,4 +1,4 @@
-# Mee6like-XP-Bot
+# MeeXP / Mee6like-XP-Bot
 Simple C++ discord bot, that is using the same system for use XP and ranks as Mee6.
 
 # How to setup (linux - debian)
