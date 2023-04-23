@@ -54,8 +54,6 @@ unzip master.zip
 
 cd MeeXP
 
-cd LinuxBot
-
 # compilig (without cmake):
 
 g++ -o3 -std=c++17 main.cpp fileIO.cpp event.cpp -o xpbot -ldpp
