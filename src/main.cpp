@@ -1,4 +1,5 @@
-﻿#include <dpp/dpp.h>
+﻿#include <cstdint>
+#include <dpp.h>
 
 #include <string>
 #include <stdio.h>
@@ -168,6 +169,8 @@ void topRanksEmbed(dpp::slashcommand_t event)
 
 int main()
 {
+    printw("> :ballot_box_with_check: Starting MeeXP bot");
+
     // time as seed for random generator used in addRandomXP();
     srand(time(NULL));
 
@@ -212,17 +215,25 @@ int main()
 
             //bot.global_command_create(dpp::slashcommand("xpneed", "Show how many xp do you need for ranks form 0 to 100.", bot.me.id));
 
-            dpp::slashcommand setxpcommand("setxp", "Sets xp of user (this will overrite their XP and level), admin only command.", bot.me.id);
+            dpp::slashcommand setxpcommand("setxp", "[admin only] Sets xp of user (this will overrite their XP and level).", bot.me.id);
             setxpcommand.add_option(dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true));
             setxpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
             bot.global_command_create(setxpcommand);
 
-            dpp::slashcommand givexpcommand("givexp", "Gives xp to a user, admin only command.", bot.me.id);
+            dpp::slashcommand givexpcommand("givexp", "[admin only] Gives xp to a user.", bot.me.id);
             givexpcommand.add_option(dpp::command_option(dpp::co_user, "user", "Mention user to give xp to.", true));
             givexpcommand.add_option(dpp::command_option(dpp::co_number, "xp", "How many xp to give. (any number between 0 and 9007199254740992)", true));
             bot.global_command_create(givexpcommand);
 
+            dpp::slashcommand globalxp("globalxp", "[admin only] Sets xp modifier, example: 130 = +30% more xp than usual.", bot.me.id);
+            rankcommand.add_option(
+                dpp::command_option(dpp::co_number, "xpmodifier", "What xp modifier to use, example: 130 = +30% more xp than usual.",true)
+            );
+
+            bot.global_command_create(dpp::slashcommand("forcesave", "[admin only] Force to save database. (usefull if you are restarting server)", bot.me.id));
+
             bot.global_command_create(dpp::slashcommand("silence", "Turn off level up messages for yourself.", bot.me.id));
+
         }
     });
 
@@ -242,7 +253,7 @@ int main()
 
             if (subcommand)
             {
-                uint64_t ID = std::get<dpp::snowflake>(event.get_parameter("user"));
+                unsigned long long ID = std::get<dpp::snowflake>(event.get_parameter("user"));
                 if (isUserInDatabase(ID))
                 rankEmbed(event, *dpp::find_user(ID));
                 else
@@ -259,6 +270,14 @@ int main()
         {
             xpNeededEmbed(event);
         }
+        if (event.command.get_command_name() == "forcesave")
+        {    
+            if (ismoderator(event.command.get_issuing_user()))
+            {
+                sett::globalxpmultiplayer = std::get<double>(event.get_parameter("xpmodifier"))/(double)100;
+                event.reply(":thumbsup:");
+            }
+        }
         if (event.command.get_command_name() == "silence")
         {
             sielence(event.command.get_issuing_user());
@@ -268,7 +287,7 @@ int main()
         {
             if (ismoderator(event.command.get_issuing_user()))
             {
-                uint64_t ID = std::get<dpp::snowflake>(event.get_parameter("user"));
+                unsigned long long ID = std::get<dpp::snowflake>(event.get_parameter("user"));
                 if (isUserInDatabase(ID))
                 {
                     setXP(*dpp::find_user(ID), std::get<double>(event.get_parameter("xp")));
@@ -288,7 +307,7 @@ int main()
         {
             if (ismoderator(event.command.get_issuing_user()))
             {
-                uint64_t ID = std::get<dpp::snowflake>(event.get_parameter("user"));
+                unsigned long long ID = std::get<dpp::snowflake>(event.get_parameter("user"));
                 if (isUserInDatabase(ID))
                 {
                     giveXP(*dpp::find_user(std::get<dpp::snowflake>(event.get_parameter("user"))), std::get<double>(event.get_parameter("xp")));
@@ -302,6 +321,14 @@ int main()
             else
             {
                 event.reply("This is admin only command.");
+            }
+        }
+        if (event.command.get_command_name() == "forcesave")
+        {
+            if (ismoderator(event.command.get_issuing_user()))
+            {
+                saveData(getDatabase(),18446744073709551615);
+                event.reply(":thumbsup:");
             }
         }
 
@@ -318,6 +345,7 @@ int main()
     using namespace std::chrono;
     auto start = high_resolution_clock::now();
     #endif
+
 
     unsigned int min=0;
     unsigned int tim=0;
@@ -346,9 +374,10 @@ int main()
             applyXP();
         }
         //save every set time in settings (default 1 min)
-        if (tim == 4*60*sett::saveinterval)
+        if (tim == sett::saveinterval)
         {
-            saveData(getDatabase(),-1);
+            saveData(getDatabase(),(unsigned long long)18446744073709551615);
+            tim=0;
         }
     };
 

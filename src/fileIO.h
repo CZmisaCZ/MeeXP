@@ -6,3 +6,4 @@
 void saveData(std::vector<UserXP*> UserXPs, unsigned long long time);
 std::vector<UserXP*> loadData();
 void ressetFileDates();
+void printw(std::string input);

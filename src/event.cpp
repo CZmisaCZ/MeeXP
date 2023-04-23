@@ -1,8 +1,7 @@
 #include "event.h"
 #include "fileIO.h"
-#include <iostream>
 #include "settings.h"
-#include <cstdint> // for uint64_t
+#include <sys/types.h>
 
 std::vector<UserXP*> UserXPs;
 
@@ -35,16 +34,16 @@ bool checkLvlUp(unsigned long long at)
 // adds XP to user unsing his positin in <vector>UserXPs, mee6 bot like XP calculation
 void addRandomXP(unsigned long long at)
 {
-	if (UserXPs.at(at)->xp < (uint64_t)18446744073709551615-(25*sett::globalxpmultiplayer))
+	if (UserXPs.at(at)->xp < (unsigned long long)18446744073709551615-(unsigned long long)(25*sett::globalxpmultiplayer))
 		UserXPs.at(at)->xp += (15 + rand() % 10) * sett::globalxpmultiplayer;
 	else
-		if(sett::print)printf(("user: " + std::to_string(UserXPs.at(at)->userID) + " has reached xp limit, what a no lifer.\n").c_str());
+		printw("> :warning: user: " + std::to_string(UserXPs.at(at)->userID) + " has reached xp limit, what a no lifer.");
 }
 
 // add user to database
 void addUser(unsigned long long ID)
 {
-	if (UserXPs.size()!= (uint64_t)18446744073709551615)
+	if (UserXPs.size()!= (unsigned long long)18446744073709551615)
 	{
 		UserXP* newUserXP = new UserXP;
 		newUserXP->userID = ID;
@@ -53,7 +52,7 @@ void addUser(unsigned long long ID)
 	}
 	else
 	{
-		if (sett::print)printf("user database is full, limit: 18446744073709551615\n");
+		printw("> :bangbang: user database is full, limit: 18446744073709551615");
 	}
 }
 
@@ -90,7 +89,7 @@ bool addXP(dpp::user user)
 			{
 				UserXPs.at(i)->updated = true;
 				addRandomXP(i);
-				if (UserXPs.at(i)->messages< (uint64_t)18446744073709551615)UserXPs.at(i)->messages++;else printf(("user " + std::to_string(UserXPs.at(i)->userID)+ " has reached meessages limit: 18446744073709551615\n").c_str());
+				if (UserXPs.at(i)->messages< (unsigned long long)18446744073709551615)UserXPs.at(i)->messages++;else printw(("user " + std::to_string(UserXPs.at(i)->userID)+ " has reached meessages limit: 18446744073709551615").c_str());
 				return checkLvlUp(i);
 			}
 		}
@@ -194,7 +193,7 @@ RankData getRank(dpp::user user)
 	return RankData(user.id, UserXPs.at(num)->xp, currLVL, nextLVL, rank, UserXPs.size(), UserXPs.at(num)->lvl);
 }
 
-bool isUserInDatabase(uint64_t ID)
+bool isUserInDatabase(unsigned long long ID)
 {
 	for (auto i = 0; i < UserXPs.size(); i++)
 		if (UserXPs.at(i)->userID == ID)return 1;
@@ -265,7 +264,7 @@ bool issielent(dpp::user user)
 bool ismoderator(dpp::user user)
 {
 	for (auto i = 0; i < sett::admins.size(); i++)
-		if (user.id == sett::admins.at(i))
+		if ((unsigned long long)user.id == sett::admins.at(i))
 			return true;
 
 	return false;
