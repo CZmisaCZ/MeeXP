@@ -3,7 +3,6 @@
     # Project name, version and description
     project(discord-bot VERSION 1.0 DESCRIPTION "MeeXP")
 
-
     include(FetchContent)
 
     Set(FETCHCONTENT_QUIET FALSE)
